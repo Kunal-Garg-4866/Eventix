@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { dutyLeavesApi, registrationsApi } from '../api/eventix.js'
 
+const LOCAL_REG_KEY = 'eventix_demo_registrations'
+
 function formatDate(d) {
   if (!d) return '—'
   return new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
@@ -19,10 +21,12 @@ export default function StudentDashboard() {
     setError('')
     try {
       const [r, d] = await Promise.all([registrationsApi.mine(), dutyLeavesApi.mine()])
-      setRegs(r.data.registrations)
+      const localRegs = JSON.parse(localStorage.getItem(LOCAL_REG_KEY) || '[]')
+      const merged = [...localRegs, ...(r.data.registrations || [])]
+      setRegs(merged)
       setDls(d.data.dutyLeaves)
-      if (!dlEvent && r.data.registrations[0]) {
-        setDlEvent(r.data.registrations[0].event?._id || '')
+      if (!dlEvent && merged[0]) {
+        setDlEvent(merged[0].event?._id || '')
       }
     } catch {
       setError('Could not load dashboard data.')
@@ -50,8 +54,27 @@ export default function StudentDashboard() {
 
   return (
     <div className="page-wide">
-      <h1>Student dashboard</h1>
-      <p className="muted">Your registrations and duty leave requests.</p>
+      <section className="page-hero card card-pad">
+        <div>
+          <p className="eyebrow">Student control center</p>
+          <h1>Student dashboard</h1>
+          <p className="muted">Track your registrations, team participation, and duty leave requests in one place.</p>
+        </div>
+        <div className="hero-stats compact">
+          <div className="stat-box">
+            <strong>{regs.length}</strong>
+            <span>Registered events</span>
+          </div>
+          <div className="stat-box">
+            <strong>{dls.length}</strong>
+            <span>DL applications</span>
+          </div>
+          <div className="stat-box">
+            <strong>{dls.filter((x) => x.status === 'approved').length}</strong>
+            <span>Approved requests</span>
+          </div>
+        </div>
+      </section>
       {error && <p className="form-error">{error}</p>}
 
       <section className="card card-pad section-block">
@@ -104,6 +127,7 @@ export default function StudentDashboard() {
       <section className="card card-pad section-block">
         <h2>Apply for duty leave</h2>
         <p className="muted small">You may only apply for events you are registered for.</p>
+        <p className="muted small">Note: duty leave application works for backend-registered events.</p>
         <form onSubmit={submitDl} className="form-stack" style={{ maxWidth: '32rem' }}>
           <label className="field">
             <span>Event</span>

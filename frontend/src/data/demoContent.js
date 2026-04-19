@@ -182,3 +182,48 @@ export const featuredTracks = [
   'Debates, forums, and speaker sessions',
   'Robotics, AI, and innovation showcases',
 ]
+
+export const societyEventCatalog = {
+  'IEEE Student Branch': [
+    'Circuit Design Challenge',
+    'Embedded Systems Mini Hack',
+    'Research Paper Clinic',
+    'IoT Prototype Showcase',
+    'Technical Quiz League',
+  ],
+  'GeeksforGeeks Campus Chapter': [
+    'DSA Night Sprint',
+    'Aptitude Power Practice',
+    'Mock Interview Marathon',
+    'CP Ladder Contest',
+    'Problem Solving Relay',
+  ],
+  'Coding Ninjas Club': [
+    'Web Dev Build Sprint',
+    'Backend API Masterclass',
+    'React Performance Lab',
+    'System Design Basics',
+    'Placement Prep Camp',
+  ],
+  'Microsoft Learn Student Ambassadors': [
+    'Azure Deploy Day',
+    'AI Agents Workshop',
+    'GitHub Copilot Studio',
+    'Cloud Security Foundations',
+    'Productivity with M365',
+  ],
+  'Robotics & Automation Society': [
+    'Line Follower Arena',
+    'Drone Control Workshop',
+    'Robo Soccer Trials',
+    'Automation Circuit Lab',
+    'Bot Design Review',
+  ],
+  'Debate & Public Speaking Forum': [
+    'Parliamentary Debate Round',
+    'Policy Speech Clinic',
+    'Extempore Face-off',
+    'Public Speaking Studio',
+    'Model UN Prep Session',
+  ],
+}

@@ -152,8 +152,27 @@ export default function AdminDashboard() {
 
   return (
     <div className="page-wide">
-      <h1>Society admin dashboard</h1>
-      <p className="muted">Manage your society, events, registrations, and duty leave.</p>
+      <section className="page-hero card card-pad">
+        <div>
+          <p className="eyebrow">Admin control center</p>
+          <h1>Society admin dashboard</h1>
+          <p className="muted">Manage your society, events, registrations, and duty leave approvals efficiently.</p>
+        </div>
+        <div className="hero-stats compact">
+          <div className="stat-box">
+            <strong>{events.length}</strong>
+            <span>Managed events</span>
+          </div>
+          <div className="stat-box">
+            <strong>{regs.length}</strong>
+            <span>Total registrations</span>
+          </div>
+          <div className="stat-box">
+            <strong>{dls.filter((x) => x.status === 'pending').length}</strong>
+            <span>Pending DL approvals</span>
+          </div>
+        </div>
+      </section>
       {message && <p className="form-success">{message}</p>}
       {error && <p className="form-error">{error}</p>}
 

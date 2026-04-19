@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { societiesApi } from '../api/eventix.js'
-import { demoSocieties } from '../data/demoContent.js'
+import { demoSocieties, societyEventCatalog } from '../data/demoContent.js'
 
 export default function Societies() {
   const [societies, setSocieties] = useState([])
@@ -64,6 +64,18 @@ export default function Societies() {
               <div className="mini-stats" style={{ marginTop: '1rem' }}>
                 <span>{s.members || 100}+ members</span>
                 <span>{s.eventsHosted || 6} events</span>
+              </div>
+              <div style={{ marginTop: '0.85rem' }}>
+                <p className="muted small" style={{ marginBottom: '0.4rem' }}>
+                  Popular events
+                </p>
+                <div className="tag-cloud">
+                  {(societyEventCatalog[s.name] || []).slice(0, 5).map((eventName) => (
+                    <span key={eventName} className="tag-chip">
+                      {eventName}
+                    </span>
+                  ))}
+                </div>
               </div>
             </article>
           ))}
