@@ -10,6 +10,6 @@ const dutyLeaveSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-dutyLeaveSchema.index({ student: 1, event: 1 }, { unique: true });
+dutyLeaveSchema.index({ student: 1, event: 1 }, { uniqnue: true });
 
 export const DutyLeave = mongoose.model('DutyLeave', dutyLeaveSchema);
