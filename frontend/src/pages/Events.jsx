@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { eventsApi } from '../api/eventix.js'
+import { Link, useNavigate } from 'react-router-dom'
+import { eventsApi, registrationsApi } from '../api/eventix.js'
 import { demoEvents } from '../data/demoContent.js'
+import { useAuth } from '../context/AuthContext.jsx'
+
+const LOCAL_REG_KEY = 'eventix_demo_registrations'
 
 function formatDate(d) {
   if (!d) return '—'
@@ -9,9 +12,14 @@ function formatDate(d) {
 }
 
 export default function Events() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  
   const [events, setEvents] = useState([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  
+  const [selectedEvent, setSelectedEvent] = useState(null)
 
   useEffect(() => {
     eventsApi
@@ -26,6 +34,14 @@ export default function Events() {
 
   const displayEvents = events.length > 0 ? events : demoEvents
   const featuredCount = displayEvents.filter((event) => event.status !== 'completed').length
+
+  const handleOpenEvent = (ev) => {
+    setSelectedEvent(ev)
+  }
+
+  const handleCloseModal = () => {
+    setSelectedEvent(null)
+  }
 
   return (
     <div className="page-wide">
@@ -75,11 +91,45 @@ export default function Events() {
               </p>
               <p className="muted small">{formatDate(ev.date)}</p>
               {ev.venue && <p className="muted small">Venue: {ev.venue}</p>}
-              <Link to={`/events/${ev._id}`} className="btn btn-secondary" style={{ marginTop: '0.75rem' }}>
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                style={{ marginTop: '0.75rem' }}
+                onClick={() => handleOpenEvent(ev)}
+              >
                 View details
-              </Link>
+              </button>
             </article>
           ))}
+        </div>
+      )}
+
+      {selectedEvent && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content card" onClick={e => e.stopPropagation()}>
+            <button className="modal-close icon-btn" onClick={handleCloseModal}>✕</button>
+            
+              <div className="event-details-view">
+                <h2>{selectedEvent.title}</h2>
+                <div className="event-meta" style={{ marginBottom: '1rem' }}>
+                  <span className="badge">{selectedEvent.eventType}</span>
+                  <span className="badge badge-neutral">{selectedEvent.status}</span>
+                </div>
+                <p><strong>Date:</strong> {formatDate(selectedEvent.date)}</p>
+                <p><strong>Venue:</strong> {selectedEvent.venue || 'TBA'}</p>
+                {selectedEvent.eventType === 'team' && (
+                  <p><strong>Team Size:</strong> {selectedEvent.teamSizeMin} - {selectedEvent.teamSizeMax}</p>
+                )}
+                <div className="desc-box muted" style={{ marginTop: '1rem', marginBottom: '1.5rem', whiteSpace: 'pre-wrap' }}>
+                  {selectedEvent.description}
+                </div>
+                {selectedEvent.status !== 'completed' && (
+                  <Link to={`/events/${selectedEvent._id}/register`} className="btn btn-primary">
+                    Register Now
+                  </Link>
+                )}
+              </div>
+          </div>
         </div>
       )}
     </div>

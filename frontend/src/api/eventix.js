@@ -34,3 +34,8 @@ export const dutyLeavesApi = {
   society: () => api.get('/duty-leaves/society'),
   setStatus: (id, status) => api.patch(`/duty-leaves/${id}/status`, { status }),
 }
+
+export const notificationsApi = {
+  list: () => api.get('/notifications'),
+  markRead: (id) => api.patch(`/notifications/${id}/read`),
+}

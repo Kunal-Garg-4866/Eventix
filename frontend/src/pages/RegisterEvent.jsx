@@ -2,20 +2,23 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { eventsApi, registrationsApi } from '../api/eventix.js'
 import { demoEvents } from '../data/demoContent.js'
+import { useAuth } from '../context/AuthContext.jsx'
 
 const LOCAL_REG_KEY = 'eventix_demo_registrations'
 
 export default function RegisterEvent() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [event, setEvent] = useState(null)
   const [isDemoEvent, setIsDemoEvent] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [success, setSuccess] = useState('')
 
-  const [soloName, setSoloName] = useState('')
-  const [soloRoll, setSoloRoll] = useState('')
+  const [email, setEmail] = useState(user?.email || '')
+  const [soloName, setSoloName] = useState(user?.name || '')
+  const [soloRoll, setSoloRoll] = useState(user?.rollNumber || '')
   const [teamName, setTeamName] = useState('')
   const [members, setMembers] = useState([{ name: '', rollNumber: '' }])
 
@@ -84,6 +87,7 @@ export default function RegisterEvent() {
             _id: `local-${Date.now()}`,
             event,
             registrationType: 'solo',
+            email,
             soloParticipant: { name: soloName, rollNumber: soloRoll },
             teamMembers: [],
             teamName: '',
@@ -94,6 +98,7 @@ export default function RegisterEvent() {
             _id: `local-${Date.now()}`,
             event,
             registrationType: 'team',
+            email,
             teamName,
             teamMembers: members,
             soloParticipant: {},
@@ -103,10 +108,10 @@ export default function RegisterEvent() {
         setSuccess('Demo registration submitted successfully.')
         setTimeout(() => navigate('/student'), 700)
       } else if (event.eventType === 'solo') {
-        await registrationsApi.register(id, { name: soloName, rollNumber: soloRoll })
+        await registrationsApi.register(id, { email, name: soloName, rollNumber: soloRoll })
         navigate('/student')
       } else {
-        await registrationsApi.register(id, { teamName, members })
+        await registrationsApi.register(id, { email, teamName, members })
         navigate('/student')
       }
     } catch (err) {
@@ -147,6 +152,10 @@ export default function RegisterEvent() {
         {event.eventType === 'solo' ? (
           <form onSubmit={onSubmit} className="form-stack">
             <label className="field">
+              <span>Email address</span>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </label>
+            <label className="field">
               <span>Name</span>
               <input value={soloName} onChange={(e) => setSoloName(e.target.value)} required />
             </label>
@@ -160,6 +169,10 @@ export default function RegisterEvent() {
           </form>
         ) : (
           <form onSubmit={onSubmit} className="form-stack">
+            <label className="field">
+              <span>Email address</span>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </label>
             <label className="field">
               <span>Team name</span>
               <input value={teamName} onChange={(e) => setTeamName(e.target.value)} required />
