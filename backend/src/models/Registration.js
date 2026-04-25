@@ -12,6 +12,7 @@ const registrationSchema = new mongoose.Schema(
   {
     event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event', required: true },
     student: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
     registrationType: { type: String, enum: ['solo', 'team'], required: true },
     soloParticipant: {
       name: { type: String, trim: true },

@@ -7,6 +7,7 @@ import societyRoutes from './routes/societyRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import registrationRoutes from './routes/registrationRoutes.js';
 import dutyLeaveRoutes from './routes/dutyLeaveRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/societies', societyRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/registrations', registrationRoutes);
 app.use('/api/duty-leaves', dutyLeaveRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });

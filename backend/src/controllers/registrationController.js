@@ -1,6 +1,7 @@
 import { Registration } from '../models/Registration.js';
 import { Event } from '../models/Event.js';
 import { Society } from '../models/Society.js';
+import { Notification } from '../models/Notification.js';
 
 function normalizeRoll(r) {
   return String(r || '').trim().toLowerCase();
@@ -32,25 +33,31 @@ export async function registerForEvent(req, res, next) {
     }
 
     if (event.eventType === 'solo') {
-      const { name, rollNumber } = req.body;
-      if (!name || !rollNumber) {
-        return res.status(400).json({ message: 'name and rollNumber are required for solo events' });
+      const { name, rollNumber, email } = req.body;
+      if (!name || !rollNumber || !email) {
+        return res.status(400).json({ message: 'name, rollNumber, and email are required for solo events' });
       }
       const reg = await Registration.create({
         event: event._id,
         student: req.userId,
+        email: String(email).trim().toLowerCase(),
         registrationType: 'solo',
         soloParticipant: { name, rollNumber },
         teamName: '',
         teamMembers: [],
       });
+      await Notification.create({
+        user: req.userId,
+        message: `Successfully registered for event: ${event.title}`,
+        type: 'registration',
+      });
       const populated = await Registration.findById(reg._id).populate('event');
       return res.status(201).json({ registration: populated });
     }
 
-    const { teamName, members } = req.body;
-    if (!teamName || !Array.isArray(members) || members.length === 0) {
-      return res.status(400).json({ message: 'teamName and members array are required for team events' });
+    const { teamName, members, email } = req.body;
+    if (!teamName || !Array.isArray(members) || members.length === 0 || !email) {
+      return res.status(400).json({ message: 'teamName, members array, and email are required for team events' });
     }
     const teamMembers = members.map((m) => ({
       name: String(m.name || '').trim(),
@@ -72,10 +79,16 @@ export async function registerForEvent(req, res, next) {
     const reg = await Registration.create({
       event: event._id,
       student: req.userId,
+      email: String(email).trim().toLowerCase(),
       registrationType: 'team',
       teamName,
       teamMembers,
       soloParticipant: {},
+    });
+    await Notification.create({
+      user: req.userId,
+      message: `Successfully registered for event: ${event.title}`,
+      type: 'registration',
     });
     const populated = await Registration.findById(reg._id).populate('event');
     return res.status(201).json({ registration: populated });

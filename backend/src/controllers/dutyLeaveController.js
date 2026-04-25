@@ -2,6 +2,7 @@ import { DutyLeave } from '../models/DutyLeave.js';
 import { Registration } from '../models/Registration.js';
 import { Event } from '../models/Event.js';
 import { Society } from '../models/Society.js';
+import { Notification } from '../models/Notification.js';
 
 export async function applyDutyLeave(req, res, next) {
   try {
@@ -81,6 +82,13 @@ export async function updateDutyLeaveStatus(req, res, next) {
     const populated = await DutyLeave.findById(dl._id)
       .populate('student', 'name email rollNumber')
       .populate('event', 'title date');
+      
+    await Notification.create({
+      user: dl.student,
+      message: `Your duty leave for ${populated.event.title} has been ${status}`,
+      type: 'duty_leave',
+    });
+
     res.json({ dutyLeave: populated });
   } catch (e) {
     next(e);
