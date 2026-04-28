@@ -10,6 +10,16 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    const status = err.response?.status
+    const url = err.config?.url
+    console.error(`[API] ${status ?? 'ERR'} ${url}`, err.message)
+    return Promise.reject(err)
+  }
+)
+
 export function setAuthToken(token) {
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`

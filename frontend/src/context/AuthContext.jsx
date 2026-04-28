@@ -29,7 +29,8 @@ export function AuthProvider({ children }) {
       authApi
         .me()
         .then((res) => setUser(res.data.user))
-        .catch(() => {
+        .catch((err) => {
+          console.warn('[Auth] token validation failed, clearing session', err.message)
           persistToken(null)
           setUser(null)
         })

@@ -5,6 +5,8 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 
+console.log('[Eventix] app boot | env:', import.meta.env.MODE, '| api:', import.meta.env.VITE_API_URL || '/api')
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
