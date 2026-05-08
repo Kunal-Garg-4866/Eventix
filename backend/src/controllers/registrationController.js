@@ -2,6 +2,8 @@ import { Registration } from '../models/Registration.js';
 import { Event } from '../models/Event.js';
 import { Society } from '../models/Society.js';
 import { Notification } from '../models/Notification.js';
+import { sendEmail } from '../utils/sendEmail.js';
+import { getRegistrationSuccessEmail } from '../utils/emailTemplates.js';
 
 function normalizeRoll(r) {
   return String(r || '').trim().toLowerCase();
@@ -52,6 +54,13 @@ export async function registerForEvent(req, res, next) {
         type: 'registration',
       });
       const populated = await Registration.findById(reg._id).populate('event');
+      
+      // Send confirmation email and await to prevent hosting from killing background task
+      const subject = `Registration Successful: ${event.title}`;
+      const text = `Hi ${name}, you have successfully registered for ${event.title}.`;
+      const html = getRegistrationSuccessEmail(event, name);
+      await sendEmail(email, subject, text, html).catch((err) => console.error("Email error:", err));
+      
       return res.status(201).json({ registration: populated });
     }
 
@@ -92,6 +101,31 @@ export async function registerForEvent(req, res, next) {
       type: 'registration',
     });
     const populated = await Registration.findById(reg._id).populate('event');
+
+    // Send confirmation emails and await to prevent hosting from killing background tasks
+    const uniqueEmails = new Set();
+    const emailPromises = [];
+
+    // Send to Team Lead (the person registering)
+    const leadEmail = String(email).trim().toLowerCase();
+    uniqueEmails.add(leadEmail);
+    const leadSubject = `Registration Successful: ${event.title}`;
+    const leadText = `Hi ${req.user.name}, you have successfully registered for ${event.title} as team ${teamName}.`;
+    const leadHtml = getRegistrationSuccessEmail(event, req.user.name, teamName);
+    emailPromises.push(sendEmail(leadEmail, leadSubject, leadText, leadHtml).catch((err) => console.error("Email error:", err)));
+
+    teamMembers.forEach((member) => {
+      if (member.email && !uniqueEmails.has(member.email)) {
+        uniqueEmails.add(member.email);
+        const subject = `Registration Successful: ${event.title}`;
+        const text = `Hi ${member.name}, you have successfully registered for ${event.title} as part of team ${teamName}.`;
+        const html = getRegistrationSuccessEmail(event, member.name, teamName);
+        emailPromises.push(sendEmail(member.email, subject, text, html).catch((err) => console.error("Email error:", err)));
+      }
+    });
+
+    await Promise.all(emailPromises);
+
     return res.status(201).json({ registration: populated });
   } catch (e) {
     next(e);
