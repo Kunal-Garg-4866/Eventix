@@ -1,5 +1,6 @@
 import { Event } from '../models/Event.js';
 import { Society } from '../models/Society.js';
+import { sendEmail } from "../utils/sendEmail.js";
 
 async function assertAdminOwnsSociety(userId, societyId) {
   const society = await Society.findById(societyId);

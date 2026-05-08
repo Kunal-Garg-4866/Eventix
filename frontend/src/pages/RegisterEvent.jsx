@@ -20,7 +20,7 @@ export default function RegisterEvent() {
   const [soloName, setSoloName] = useState(user?.name || '')
   const [soloRoll, setSoloRoll] = useState(user?.rollNumber || '')
   const [teamName, setTeamName] = useState('')
-  const [members, setMembers] = useState([{ name: '', rollNumber: '' }])
+  const [members, setMembers] = useState([{ name: '', rollNumber: '', email: '' }])
 
   useEffect(() => {
     eventsApi
@@ -31,9 +31,9 @@ export default function RegisterEvent() {
         setEvent(ev)
         if (ev.eventType === 'team') {
           const n = Math.max(ev.teamSizeMin, 1)
-          setMembers(Array.from({ length: n }, () => ({ name: '', rollNumber: '' })))
+          setMembers(Array.from({ length: n }, () => ({ name: '', rollNumber: '', email: '' })))
         } else {
-          setMembers([{ name: '', rollNumber: '' }])
+          setMembers([{ name: '', rollNumber: '', email: '' }])
         }
       })
       .catch(() => {
@@ -46,9 +46,9 @@ export default function RegisterEvent() {
         setEvent(fallback)
         if (fallback.eventType === 'team') {
           const n = Math.max(fallback.teamSizeMin, 1)
-          setMembers(Array.from({ length: n }, () => ({ name: '', rollNumber: '' })))
+          setMembers(Array.from({ length: n }, () => ({ name: '', rollNumber: '', email: '' })))
         } else {
-          setMembers([{ name: '', rollNumber: '' }])
+          setMembers([{ name: '', rollNumber: '', email: '' }])
         }
       })
   }, [id])
@@ -66,7 +66,7 @@ export default function RegisterEvent() {
   function addMember() {
     if (!event || event.eventType !== 'team') return
     if (members.length >= event.teamSizeMax) return
-    setMembers((rows) => [...rows, { name: '', rollNumber: '' }])
+   setMembers((rows) => [...rows, { name: '', rollNumber: '', email: '' }])
   }
 
   function removeMember(i) {
@@ -203,6 +203,15 @@ export default function RegisterEvent() {
                   <span>Roll number</span>
                   <input value={m.rollNumber} onChange={(e) => updateMember(i, 'rollNumber', e.target.value)} required />
                 </label>
+                <label className="field">
+                <span>Email</span>
+                <input
+                  type="email"
+                  value={m.email || ""}
+                  onChange={(e) => updateMember(i, 'email', e.target.value)}
+                  required
+                />
+              </label>
               </div>
             ))}
             <button type="submit" className="btn btn-primary" disabled={busy}>

@@ -4,6 +4,7 @@ const memberSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     rollNumber: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
   },
   { _id: false }
 );

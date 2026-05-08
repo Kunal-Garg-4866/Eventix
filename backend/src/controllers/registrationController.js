@@ -62,10 +62,11 @@ export async function registerForEvent(req, res, next) {
     const teamMembers = members.map((m) => ({
       name: String(m.name || '').trim(),
       rollNumber: String(m.rollNumber || '').trim(),
+       email: String(m.email || '').trim().toLowerCase(),
     }));
-    if (teamMembers.some((m) => !m.name || !m.rollNumber)) {
-      return res.status(400).json({ message: 'Each member needs name and rollNumber' });
-    }
+   if (teamMembers.some((m) => !m.name || !m.rollNumber || !m.email)) {
+  return res.status(400).json({ message: 'Each member needs name, rollNumber and email' });
+}
     const count = teamMembers.length;
     if (count < event.teamSizeMin || count > event.teamSizeMax) {
       return res.status(400).json({
